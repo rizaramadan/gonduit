@@ -18,7 +18,7 @@ func main() {
 	})
 
 	e.POST("/users", func(c echo.Context) (err error) {
-		i := new(users.RegisterInput)
+		i := new(users.RegisterInputwrapper)
 		if err = c.Bind(i); err != nil {
 			return err
 		}

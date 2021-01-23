@@ -8,7 +8,7 @@ func TestGetUser(t *testing.T) {
 		Password: "123",
 		Username: "a",
 	}
-	w := RegisterInputwrapper{
+	w := RegisterInputWrapper{
 		User: i,
 	}
 	u := w.GetUser()

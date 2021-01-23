@@ -4,25 +4,24 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/rizaramadan/gonduit/users"
 )
 
 type Router struct {
-	E       *echo.Echo
-	RegServ *users.RegisterService
+	E          *echo.Echo
+	regHandler *RegisterHandler
 }
 
-func NewRouter(e *echo.Echo, regServ *users.RegisterService) *Router {
+func NewRouter(e *echo.Echo, regHndlr *RegisterHandler) *Router {
 	r := &Router{
-		E:       e,
-		RegServ: regServ,
+		E:          e,
+		regHandler: regHndlr,
 	}
 	return r
 }
 
 func (r *Router) SetupEndpoints() error {
 	r.E.GET("/greetings/:user", Greeting)
-	r.E.POST("/users", RegisterHandler{Service: r.RegServ}.Register)
+	r.E.POST("/users", r.regHandler.Register)
 
 	return nil
 }

@@ -12,10 +12,19 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 
-	r := impl.NewRouter(e, &users.RegisterService{})
+	regHandler := setupRegisterHandler()
+
+	r := impl.NewRouter(e, regHandler)
 	if err := r.SetupEndpoints(); err != nil {
 		panic(err)
 	}
 
 	e.Logger.Fatal(e.Start(":1323"))
+}
+
+func setupRegisterHandler() *impl.RegisterHandler {
+	regServ := new(users.RegisterService)
+	regHandler := new(impl.RegisterHandler)
+	regHandler.Service = regServ
+	return regHandler
 }

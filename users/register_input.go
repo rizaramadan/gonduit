@@ -27,6 +27,7 @@ func (r RegisterInputWrapper) GetUser() User {
 	return user
 }
 
+//Validate is to validate RegisterInputWrapper
 func (r RegisterInputWrapper) Validate() error {
 	if r.User.Email == "" || r.User.Password == "" || r.User.Username == "" {
 		return errors.New("one of the mandatory register input is missing")

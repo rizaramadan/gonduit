@@ -1,6 +1,6 @@
 package users
 
-//User is class represent user
+//User is class represent
 type User struct {
 	Username string
 	Email    string

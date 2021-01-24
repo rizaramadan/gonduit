@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/rizaramadan/gonduit/impl"
-	"github.com/rizaramadan/gonduit/persistence"
+	"github.com/rizaramadan/gonduit/impl/persistence"
 	"github.com/rizaramadan/gonduit/users"
+	"github.com/rizaramadan/gonduit/web"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -22,7 +22,7 @@ func main() {
 	}
 	regHandler := setupRegisterHandler(db)
 
-	r := impl.NewRouter(e, regHandler)
+	r := web.NewRouter(e, regHandler)
 	if err := r.SetupEndpoints(); err != nil {
 		panic(err)
 	}
@@ -30,10 +30,10 @@ func main() {
 	e.Logger.Fatal(e.Start(":1323"))
 }
 
-func setupRegisterHandler(db *gorm.DB) *impl.RegisterHandler {
+func setupRegisterHandler(db *gorm.DB) *web.RegisterHandler {
 	userRepo := persistence.NewUserRepoDb(db)
 	regServ := users.NewRegisterService(userRepo)
-	regHandler := new(impl.RegisterHandler)
+	regHandler := new(web.RegisterHandler)
 	regHandler.Service = regServ
 	return regHandler
 }

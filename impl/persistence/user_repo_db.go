@@ -23,6 +23,9 @@ type UserRepoDb struct {
 	Db *gorm.DB
 }
 
+//Cost is required by bcrypt to generate hashed password
+const Cost = 10
+
 func NewUserRepoDb(db *gorm.DB) users.UserRepo {
 	fmt.Println("NewUserRepoDb created")
 	r := UserRepoDb{
@@ -32,9 +35,8 @@ func NewUserRepoDb(db *gorm.DB) users.UserRepo {
 }
 
 func (ur *UserRepoDb) Create(u *users.User) error {
-	cost := 10
 	salt := uuid.NewString()
-	hashed, err := bcrypt.GenerateFromPassword([]byte(u.Password+salt), cost)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(u.Password+salt), Cost)
 	if err != nil {
 		return err
 	}

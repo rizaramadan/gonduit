@@ -3,6 +3,7 @@ module github.com/rizaramadan/gonduit
 go 1.15
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Selvatico/go-mocket v1.0.7 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/google/uuid v1.2.0

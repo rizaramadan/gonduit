@@ -1,42 +1,52 @@
 package persistence
 
 import (
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/rizaramadan/gonduit/users"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"regexp"
 	"testing"
 )
 
-type MockDb struct {
-	User *User
-}
-
-func (m *MockDb) Create(v interface{}) *gorm.DB {
-	user := v.(*User)
-	m.User = user
-	return &gorm.DB{Error: nil, RowsAffected: 1}
-}
-
 func TestUserRepoDb_Create(t *testing.T) {
 	r := new(UserRepoDb)
-	mock := new(MockDb)
-	r.Db = mock
 
+	db, mock, err := sqlmock.New()
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+
+	r.Db = gormDB
 	var password = "some-password"
-	err := r.Create(&users.User{
+
+	mock.ExpectBegin()
+	mock.ExpectQuery(regexp.QuoteMeta(
+		`INSERT INTO "users" ("username","password","salt","email","bio","image") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`)).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).
+			AddRow(1))
+	mock.ExpectCommit()
+
+	user := &users.User{
 		Username: "",
 		Email:    "",
 		Password: password,
 		Token:    "",
 		Bio:      "",
 		Image:    "",
-	})
+	}
 
+	err = r.Create(user)
 	assert.Nil(t, err)
 
-	var passWithSalt = password + mock.User.Salt
-	encryptionErr := bcrypt.CompareHashAndPassword([]byte(mock.User.Password), []byte(passWithSalt))
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+	var passWithSalt = password + user.Salt
+	encryptionErr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(passWithSalt))
 
 	assert.Nil(t, encryptionErr)
 }

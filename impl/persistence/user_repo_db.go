@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/rizaramadan/gonduit/users"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type User struct {
@@ -19,14 +20,14 @@ type User struct {
 }
 
 type UserRepoDb struct {
-	Db Db
+	Db *gorm.DB
 }
 
 //Cost is required by bcrypt to generate hashed password
 const Cost = 10
 
 //NewUserRepoDb return userRepo implementation using dbms
-func NewUserRepoDb(db Db) users.UserRepo {
+func NewUserRepoDb(db *gorm.DB) users.UserRepo {
 	fmt.Println("NewUserRepoDb created")
 	r := UserRepoDb{
 		Db: db,
@@ -43,9 +44,12 @@ func (ur *UserRepoDb) Create(u *users.User) error {
 		return err
 	}
 
+	u.Password = string(hashed)
+	u.Salt = salt
+
 	result := ur.Db.Create(&User{
 		Username: u.Username,
-		Password: string(hashed),
+		Password: u.Password,
 		Salt:     salt,
 		Email:    u.Email,
 		Bio:      u.Bio,

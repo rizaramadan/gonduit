@@ -1,6 +1,9 @@
 package users
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 func TestGetUser(t *testing.T) {
 	i := RegisterInput{
@@ -12,7 +15,7 @@ func TestGetUser(t *testing.T) {
 		User: i,
 	}
 	u := w.GetUser()
-	if i.Email != u.Email || i.Password != u.Password || i.Username != u.Username {
-		t.Errorf("get user from register input wrapper fail")
-	}
+	assert.Equal(t, i.Email, u.Email)
+	assert.Equal(t, i.Password, u.Password)
+	assert.Equal(t, i.Username, u.Username)
 }

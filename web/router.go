@@ -22,18 +22,12 @@ func NewRouter(e *echo.Echo, regHandler *RegisterHandler) *Router {
 }
 
 func (r *Router) SetupEndpoints() error {
+	jwtAuth := newJwtMiddleware()
 	r.E.GET("/greetings/:user", greeting)
 	r.E.POST("/users", r.regHandler.Register)
-
-	jwtAuth := newJwtMiddleware()
 	r.E.GET("/welcome", jwtAuth(welcome))
 
 	return nil
-}
-
-func greeting(c echo.Context) error {
-	tester := c.Param("user")
-	return c.String(http.StatusOK, "hello, "+tester+"!")
 }
 
 func newJwtMiddleware() echo.MiddlewareFunc {
@@ -43,6 +37,11 @@ func newJwtMiddleware() echo.MiddlewareFunc {
 	}
 	jwtAuth := middleware.JWTWithConfig(config)
 	return jwtAuth
+}
+
+func greeting(c echo.Context) error {
+	tester := c.Param("user")
+	return c.String(http.StatusOK, "hello, "+tester+"!")
 }
 
 func welcome(c echo.Context) error {

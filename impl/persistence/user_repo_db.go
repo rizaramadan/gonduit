@@ -47,15 +47,20 @@ func (ur *UserRepoDb) Create(u *users.User) error {
 	u.Password = string(hashed)
 	u.Salt = salt
 
-	result := ur.Db.Create(&User{
-		Username: u.Username,
-		Password: u.Password,
-		Salt:     salt,
-		Email:    u.Email,
-		Bio:      u.Bio,
-		Image:    u.Image,
-	})
+	resChan := make(chan *gorm.DB)
+	go func() {
+		result := ur.Db.Create(&User{
+			Username: u.Username,
+			Password: u.Password,
+			Salt:     salt,
+			Email:    u.Email,
+			Bio:      u.Bio,
+			Image:    u.Image,
+		})
+		resChan <- result
+	}()
 
+	result := <-resChan
 	if result.Error != nil {
 		return result.Error
 	}

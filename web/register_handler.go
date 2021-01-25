@@ -19,7 +19,7 @@ func (r *RegisterHandler) Register(c echo.Context) (err error) {
 	}
 
 	if err = i.Validate(); err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, "invalid register input")
 	}
 
 	o, err := r.Service.Register(i)
